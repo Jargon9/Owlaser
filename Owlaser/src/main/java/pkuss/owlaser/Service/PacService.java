@@ -36,22 +36,43 @@ public class PacService {
 
     //得到pom文件里的依赖包信息
     public static void GetDependencies(Node root, List<Dependency> dependenciesList){
-        if(root!=null)
-            for(int i = 0; i < root.getChildNodes().size(); i++)
-            {
+        try {
+            for (int i = 0; i < root.getChildNodes().size(); i++) {
                 Dependency dependency = new Dependency();
                 dependency.setGroup_id(root.getChildNode(i).getGroupId());
                 dependency.setArtifact_id(root.getChildNode(i).getArtifactId());
                 dependency.setVersion(root.getChildNode(i).getVersion());
-                //存入Array
-                if(dependency.getArtifact_id() != null && dependency.getVersion() != null){
-                    dependenciesList.add(dependency);
+                //若数据库有则返回数据库数据，若没有则爬下来加入数据库
+                dependenciesList.add(dependency);
+                try {
+                    Node newNode = root.getChildNode(i);
+                    GetDependencies(newNode, dependenciesList);
+                }catch (IndexOutOfBoundsException e){
+                    e.printStackTrace();
                 }
-
-
             }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         return;
     }
+//    public static void GetDependencies(Node root, List<Dependency> dependenciesList){
+//        if(root!=null)
+//            for(int i = 0; i < root.getChildNodes().size(); i++)
+//            {
+//                Dependency dependency = new Dependency();
+//                dependency.setGroup_id(root.getChildNode(i).getGroupId());
+//                dependency.setArtifact_id(root.getChildNode(i).getArtifactId());
+//                dependency.setVersion(root.getChildNode(i).getVersion());
+//                //存入Array
+//                if(dependency.getArtifact_id() != null && dependency.getVersion() != null){
+//                    dependenciesList.add(dependency);
+//                }
+//
+//
+//            }
+//        return;
+//    }
 
     public void getAll(String url, Dependency dependency){
         String tmp="";
